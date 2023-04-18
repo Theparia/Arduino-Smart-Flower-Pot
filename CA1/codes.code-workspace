@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "Main Board",
+			"path": "Main Board"
+		},
+		{
+			"name": "Sensor Board",
+			"path": "Sensor Board"
+		},
+		{
+			"name": "Actuator Board",
+			"path": "Actuator Board"
+		}
+	],
+	"settings": {}
+}
