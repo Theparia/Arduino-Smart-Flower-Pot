@@ -6,8 +6,9 @@ float wateringRate = 0;
 
 void setup()
 {
-  pinMode(9, OUTPUT);
-  pinMode(8, OUTPUT);
+  pinMode(11, OUTPUT);
+  // pinMode(9, OUTPUT);
+  // pinMode(8, OUTPUT);
   Serial.begin(9600);
 }
 
@@ -15,6 +16,7 @@ void loop()
 {
   wateringRate = (Serial.parseFloat() / 100) * MAX_MOTOR_SPEED;
   Serial.println(wateringRate);
-  digitalWrite(9, wateringRate);
-  digitalWrite(8, LOW);
+  analogWrite(11, wateringRate);
+  // digitalWrite(9, wateringRate);
+  // digitalWrite(8, LOW);
 }

@@ -85,6 +85,7 @@ void sendData(float humidity, float temperature)
 {
 	Serial.print('H');
 	Serial.println(humidity);
+	// Serial.print(String(humidity) + "*" + String(temperature) + "#");
 	Serial.print('T');
 	Serial.println(temperature);
 }
