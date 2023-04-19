@@ -24,10 +24,10 @@ void loop()
 	float currentHumidity = getHumidity();
 	float currentTemperature = getTemperature();
 
-	if ((currentHumidity > 1.05 * lastHumidity) || (currentHumidity < 0.95 * lastHumidity))
+	if (fabs(currentHumidity - lastHumidity) > 5 || (lastHumidity == -1))
 	{
-		sendData(currentHumidity, currentTemperature);
 		lastHumidity = currentHumidity;
+		sendData(currentHumidity, currentTemperature);
 	}
 }
 
