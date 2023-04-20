@@ -25,6 +25,7 @@ void loop(){
       dutyCycle = parseDutyCycleData(buffer);
       wateringRate = getWateringRate(dutyCycle);
       Serial.println(wateringRate);
+      analogWrite(11, wateringRate);
       clearBuffer();
     }
   }
