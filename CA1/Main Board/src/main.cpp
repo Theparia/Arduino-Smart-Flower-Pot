@@ -2,15 +2,19 @@
 #include <LiquidCrystal.h>
 #include <Wire.h>
 
+#define BLUETOOTH_DELIMETER_CHARACTER '-'
+#define BLUETOOTH_END_CHARACTER '/'
+
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
-void handleRequest();
-void runLogic();
-void updateLCD();
-void sendData();
+String readBluetoothData();
+void showOnLcd();
+void splitData(String humidity_temp_data);
+
 
 float temperature, humidity, dutyCycle = 0;
 String buffer = "";
+
 
 void setup()
 {
@@ -20,72 +24,35 @@ void setup()
 
 void loop()
 {
-  // if (Serial.available() == 5)
-  // {
-  //   handleRequest();
-  //   runLogic();
-  //   updateLCD();
-  //   sendData();
-  // }
-
-  // Serial.println("hiiiii");
-  // lcd.println("jjjjjj");
-
-  float rate = 0;
-  Serial.println(rate);
-  delay(1000);
-
   // put your main code here, to run repeatedly:
-}
-
-void handleRequest()
-{
-  char request = Serial.read();
-  if (request == 'T')
-  {
-    temperature = Serial.parseFloat();
-    request = Serial.read();
-    humidity = Serial.parseFloat();
+  String data = readBluetoothData();
+  if (data != ""){
+    buffer += data;
+    if(data.indexOf(BLUETOOTH_END_CHARACTER) != -1){
+      splitData(buffer);
+      showOnLcd();
+      buffer = "";
+    }
   }
 }
 
-void runLogic()
-{
-  if (humidity > 30)
-    dutyCycle = 0;
-  else if (humidity > 20)
-  {
-    if (temperature < 25)
-      dutyCycle = 0;
-    else
-      dutyCycle = 10;
-  }
-  else if (humidity > 10)
-    dutyCycle = 20;
-  else
-    dutyCycle = 25;
-}
-
-void updateLCD()
-{
+void showOnLcd(){
   lcd.clear();
   lcd.setCursor(0, 0);
-
-  if (dutyCycle == 10)
-    lcd.println("Water: 10 cc/min");
-  else if (dutyCycle == 20)
-    lcd.println("Water: 15 cc/min");
-  else if (dutyCycle == 25)
-    lcd.println("Water: 20 cc/min");
-  else
-    lcd.println("Water: 0 cc/min");
-
+  lcd.print("T: " + String(temperature));
   lcd.setCursor(0, 1);
-  lcd.print("Duty Cycle: ");
-  lcd.println(dutyCycle);
+  lcd.print("H: " + String(humidity));
 }
 
-void sendData()
-{
-  Serial.println(dutyCycle);
+void splitData(String humidityTemperatureData){
+  int delimeter_index = humidityTemperatureData.indexOf(BLUETOOTH_DELIMETER_CHARACTER);
+  String humidityStr = humidityTemperatureData.substring(0, delimeter_index);
+  String temperatureStr = humidityTemperatureData.substring(delimeter_index + 1, humidityTemperatureData.length() - 1);
+  humidity = atoi(&humidityStr[0]);
+  temperature = atoi(&temperatureStr[0]);
+}
+
+String readBluetoothData(){
+  String data = Serial.readString();
+  return data;
 }

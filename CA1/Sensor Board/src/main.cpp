@@ -9,12 +9,18 @@ float getHumidity();
 float getTemperature();
 void sendData(float, float);
 
+
+#define BLUETOOTH_TEMPERATURE_START_CHAR 'T'
+#define BLUETOOTH_HUMIDITY_START_CHAR 'H'
+#define BLUETOOTH_DELIMETER_CHARACTER '-'
+#define BLUETOOTH_END_CHARACTER '/'
+
 void setup()
 {
 	// Initialise I2C communication as MASTER
-	Wire.begin();
+	Wire.begin(); // connection to sensor
 	// Initialise UART serial communication, set baud rate = 9600
-	Serial.begin(9600);
+	Serial.begin(9600); // bluetooth connection
 }
 
 void loop()
@@ -83,9 +89,6 @@ float getTemperature()
 
 void sendData(float humidity, float temperature)
 {
-	Serial.print('H');
-	Serial.println(humidity);
-	// Serial.print(String(humidity) + "*" + String(temperature) + "#");
-	Serial.print('T');
-	Serial.println(temperature);
+	String message = String(humidity) + BLUETOOTH_DELIMETER_CHARACTER + String(temperature) + BLUETOOTH_END_CHARACTER;
+  	Serial.println(&message[0]);
 }
