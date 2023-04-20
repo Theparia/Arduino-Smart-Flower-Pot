@@ -11,6 +11,10 @@ String readBluetoothData();
 void showOnLcd(float temperature, float humidity, float dutyCycle);
 void splitSensorData(String humidity_temp_data);
 float getDutyCycle();
+void sendData(float dutyCycle);
+void clearBuffer();
+
+
 
 float temperature, humidity;
 String buffer = "";
@@ -30,7 +34,8 @@ void loop(){
       splitSensorData(buffer);
       float dutyCycle = getDutyCycle();
       showOnLcd(humidity, temperature, dutyCycle);
-      buffer = "";
+      sendData(dutyCycle);
+      clearBuffer();
     }
   }
 }
@@ -71,4 +76,13 @@ float getDutyCycle(){
     return 20;
   else
     return 25;
+}
+
+void clearBuffer(){
+  buffer = "";
+}
+
+void sendData(float dutyCycle){
+	String message = String(dutyCycle) + BLUETOOTH_END_CHARACTER;
+  Serial.println(&message[0]);
 }

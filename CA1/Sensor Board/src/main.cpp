@@ -15,30 +15,26 @@ void sendData(float, float);
 #define BLUETOOTH_DELIMETER_CHARACTER '-'
 #define BLUETOOTH_END_CHARACTER '/'
 
-void setup()
-{
+void setup(){
 	// Initialise I2C communication as MASTER
 	Wire.begin(); // connection to sensor
 	// Initialise UART serial communication, set baud rate = 9600
 	Serial.begin(9600); // bluetooth connection
 }
 
-void loop()
-{
+void loop(){
 	static float lastHumidity = -1;
 
 	float currentHumidity = getHumidity();
 	float currentTemperature = getTemperature();
 
-	if (fabs(currentHumidity - lastHumidity) > 5 || (lastHumidity == -1))
-	{
+	if (fabs(currentHumidity - lastHumidity) > 5 || (lastHumidity == -1)){
 		lastHumidity = currentHumidity;
 		sendData(currentHumidity, currentTemperature);
 	}
 }
 
-float getHumidity()
-{
+float getHumidity(){
 	unsigned int data[2];
 	// Start I2C transmission
 	Wire.beginTransmission(SHT25_I2C_ADDRESS);
@@ -51,8 +47,7 @@ float getHumidity()
 	Wire.requestFrom(SHT25_I2C_ADDRESS, 2);
 	// Read 2 bytes of data
 	// humidity msb, humidity lsb
-	if (Wire.available() == 2)
-	{
+	if (Wire.available() == 2){
 		data[0] = Wire.read();
 		data[1] = Wire.read();
 		// Convert the data
@@ -62,8 +57,7 @@ float getHumidity()
 	}
 }
 
-float getTemperature()
-{
+float getTemperature(){
 	unsigned int data[2];
 	// Start I2C transmission
 	Wire.beginTransmission(SHT25_I2C_ADDRESS);
@@ -76,8 +70,7 @@ float getTemperature()
 	Wire.requestFrom(SHT25_I2C_ADDRESS, 2);
 	// Read 2 bytes of data
 	// temp msb, temp lsb
-	if (Wire.available() == 2)
-	{
+	if (Wire.available() == 2){
 		data[0] = Wire.read();
 		data[1] = Wire.read();
 		// Convert the data
@@ -87,8 +80,7 @@ float getTemperature()
 	}
 }
 
-void sendData(float humidity, float temperature)
-{
+void sendData(float humidity, float temperature){
 	String message = String(humidity) + BLUETOOTH_DELIMETER_CHARACTER + String(temperature) + BLUETOOTH_END_CHARACTER;
   	Serial.println(&message[0]);
 }
