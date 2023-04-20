@@ -8,51 +8,67 @@
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
 String readBluetoothData();
-void showOnLcd();
-void splitData(String humidity_temp_data);
+void showOnLcd(float temperature, float humidity, float dutyCycle);
+void splitSensorData(String humidity_temp_data);
+float getDutyCycle();
 
-
-float temperature, humidity, dutyCycle = 0;
+float temperature, humidity;
 String buffer = "";
 
 
-void setup()
-{
+void setup(){
   Serial.begin(9600);
   lcd.begin(20, 4);
 }
 
-void loop()
-{
+void loop(){
   // put your main code here, to run repeatedly:
   String data = readBluetoothData();
   if (data != ""){
     buffer += data;
     if(data.indexOf(BLUETOOTH_END_CHARACTER) != -1){
-      splitData(buffer);
-      showOnLcd();
+      splitSensorData(buffer);
+      float dutyCycle = getDutyCycle();
+      showOnLcd(humidity, temperature, dutyCycle);
       buffer = "";
     }
   }
 }
 
-void showOnLcd(){
+void showOnLcd(float humidity, float temperature, float dutyCycle){ //TODO: LCD <4 x 20> on Proteus
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print("T: " + String(temperature));
+  lcd.print("H:  " + String(humidity));
   lcd.setCursor(0, 1);
-  lcd.print("H: " + String(humidity));
+  lcd.print("T:  " + String(temperature));
+  lcd.setCursor(-4, 2);
+  lcd.print("DC: " + String(dutyCycle));
 }
 
-void splitData(String humidityTemperatureData){
+void splitSensorData(String humidityTemperatureData){
   int delimeter_index = humidityTemperatureData.indexOf(BLUETOOTH_DELIMETER_CHARACTER);
   String humidityStr = humidityTemperatureData.substring(0, delimeter_index);
   String temperatureStr = humidityTemperatureData.substring(delimeter_index + 1, humidityTemperatureData.length() - 1);
-  humidity = atoi(&humidityStr[0]);
-  temperature = atoi(&temperatureStr[0]);
+  humidity = atof(&humidityStr[0]);
+  temperature = atof(&temperatureStr[0]);
 }
 
 String readBluetoothData(){
   String data = Serial.readString();
   return data;
+}
+
+float getDutyCycle(){
+  if (humidity > 30)
+    return 0;
+  else if (humidity > 20){
+    if (temperature < 25)
+      return 0;
+    else
+      return 10;
+  }
+  else if (humidity > 10)
+    return 20;
+  else
+    return 25;
 }
