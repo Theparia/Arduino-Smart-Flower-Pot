@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
 #define MAX_MOTOR_SPEED 256
-#define BLUETOOTH_END_CHARACTER '/'
+#define BLUETOOTH_DATA_DELIMITER '#'
 
 String readBluetoothData();
 float parseDutyCycleData(String dutyCycleData);
@@ -18,10 +18,10 @@ void setup(){
 
 void loop(){
   float wateringRate, dutyCycle;
-  String data = readBluetoothData();
-  if (data != ""){
-    buffer += data;
-    if(data.indexOf(BLUETOOTH_END_CHARACTER) != -1){
+  String recievedData = readBluetoothData();
+  if (recievedData != ""){
+    buffer += recievedData;
+    if(recievedData.indexOf(BLUETOOTH_DATA_DELIMITER) != -1){
       dutyCycle = parseDutyCycleData(buffer);
       wateringRate = getWateringRate(dutyCycle);
       Serial.println(wateringRate);

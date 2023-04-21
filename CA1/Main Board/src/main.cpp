@@ -2,15 +2,23 @@
 #include <LiquidCrystal.h>
 #include <Wire.h>
 
-#define BLUETOOTH_DELIMETER_CHARACTER '-'
-#define BLUETOOTH_END_CHARACTER '/'
+#define BLUETOOTH_DATA_SEPERATOR '/'
+#define BLUETOOTH_DATA_DELIMITER '#'
 
-LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+#define RS 12
+#define EN 11
+#define D4 5
+#define D5 4
+#define D6 3
+#define D7 2
+
+LiquidCrystal lcd(RS, EN, D4, D5, D6, D7);
 
 String readBluetoothData();
 void showOnLcd(float temperature, float humidity, float dutyCycle);
 void splitSensorData(String humidity_temp_data);
 float getDutyCycle();
+float getWateringRate(float dutyCycle);
 void sendData(float dutyCycle);
 void clearBuffer();
 
@@ -27,10 +35,10 @@ void setup(){
 
 void loop(){
   // put your main code here, to run repeatedly:
-  String data = readBluetoothData();
-  if (data != ""){
-    buffer += data;
-    if(data.indexOf(BLUETOOTH_END_CHARACTER) != -1){
+  String recievedData = readBluetoothData();
+  if (recievedData != ""){
+    buffer += recievedData;
+    if(recievedData.indexOf(BLUETOOTH_DATA_SEPERATOR) != -1){
       splitSensorData(buffer);
       float dutyCycle = getDutyCycle();
       showOnLcd(humidity, temperature, dutyCycle);
@@ -40,18 +48,29 @@ void loop(){
   }
 }
 
-void showOnLcd(float humidity, float temperature, float dutyCycle){ //TODO: LCD <4 x 20> on Proteus
+void showOnLcd(float humidity, float temperature, float dutyCycle){
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print("H:  " + String(humidity));
+  lcd.print("H: " + String(humidity) + " %");
   lcd.setCursor(0, 1);
-  lcd.print("T:  " + String(temperature));
+  lcd.print("T: " + String(temperature) + " C");
   lcd.setCursor(-4, 2);
-  lcd.print("DC: " + String(dutyCycle));
+  lcd.print("R: " + String(getWateringRate(dutyCycle)) + " CC/min");
+}
+
+float getWateringRate(float dutyCycle){
+  if (dutyCycle == 10)
+    return 10;
+  else if (dutyCycle == 20)
+    return 15;
+  else if (dutyCycle == 25)
+    return 20;
+  else
+    return 0; 
 }
 
 void splitSensorData(String humidityTemperatureData){
-  int delimeter_index = humidityTemperatureData.indexOf(BLUETOOTH_DELIMETER_CHARACTER);
+  int delimeter_index = humidityTemperatureData.indexOf(BLUETOOTH_DATA_SEPERATOR);
   String humidityStr = humidityTemperatureData.substring(0, delimeter_index);
   String temperatureStr = humidityTemperatureData.substring(delimeter_index + 1, humidityTemperatureData.length() - 1);
   humidity = atof(&humidityStr[0]);
@@ -83,6 +102,6 @@ void clearBuffer(){
 }
 
 void sendData(float dutyCycle){
-	String message = String(dutyCycle) + BLUETOOTH_END_CHARACTER;
-  Serial.println(&message[0]);
+	String message = String(dutyCycle) + BLUETOOTH_DATA_DELIMITER;
+  Serial.println(message);
 }
