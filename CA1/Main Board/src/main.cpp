@@ -4,7 +4,7 @@
 
 #define BLUETOOTH_DATA_SEPERATOR '/'
 #define BLUETOOTH_DATA_DELIMITER '#'
-
+#define BLUETOOTH_BAUD_RATE 9600
 #define RS 12
 #define EN 11
 #define D4 5
@@ -12,29 +12,24 @@
 #define D6 3
 #define D7 2
 
-LiquidCrystal lcd(RS, EN, D4, D5, D6, D7);
-
 String readBluetoothData();
 void showOnLcd(float temperature, float humidity, float dutyCycle);
-void splitSensorData(String humidity_temp_data);
+void splitSensorData(String HTData);
 float getDutyCycle();
 float getWateringRate(float dutyCycle);
 void sendData(float dutyCycle);
 void clearBuffer();
 
-
-
+LiquidCrystal lcd(RS, EN, D4, D5, D6, D7);
 float temperature, humidity;
 String buffer = "";
 
-
 void setup(){
-  Serial.begin(9600);
+  Serial.begin(BLUETOOTH_BAUD_RATE);
   lcd.begin(20, 4);
 }
 
 void loop(){
-  // put your main code here, to run repeatedly:
   String recievedData = readBluetoothData();
   if (recievedData != ""){
     buffer += recievedData;
@@ -70,16 +65,15 @@ float getWateringRate(float dutyCycle){
 }
 
 void splitSensorData(String humidityTemperatureData){
-  int delimeter_index = humidityTemperatureData.indexOf(BLUETOOTH_DATA_SEPERATOR);
-  String humidityStr = humidityTemperatureData.substring(0, delimeter_index);
-  String temperatureStr = humidityTemperatureData.substring(delimeter_index + 1, humidityTemperatureData.length() - 1);
+  int seperatorIdx = humidityTemperatureData.indexOf(BLUETOOTH_DATA_SEPERATOR);
+  String humidityStr = humidityTemperatureData.substring(0, seperatorIdx);
+  String temperatureStr = humidityTemperatureData.substring(seperatorIdx + 1, humidityTemperatureData.length() - 1);
   humidity = atof(&humidityStr[0]);
   temperature = atof(&temperatureStr[0]);
 }
 
 String readBluetoothData(){
-  String data = Serial.readString();
-  return data;
+  return Serial.readString();
 }
 
 float getDutyCycle(){

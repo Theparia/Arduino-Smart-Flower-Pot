@@ -2,6 +2,10 @@
 
 #define MAX_MOTOR_SPEED 256
 #define BLUETOOTH_DATA_DELIMITER '#'
+#define BLUETOOTH_BAUD_RATE 9600
+#define MOTOR_PIN1 9
+#define MOTOR_PIN2 10
+
 
 String readBluetoothData();
 float parseDutyCycleData(String dutyCycleData);
@@ -9,35 +13,36 @@ float getWateringRate(float dutyCycle);
 void clearBuffer();
 
 String buffer = "";
-float wateringRate = 0;
 
 void setup(){
-  pinMode(11, OUTPUT);
-  Serial.begin(9600);
+  pinMode(MOTOR_PIN1, OUTPUT);
+  pinMode(MOTOR_PIN2, OUTPUT);
+  Serial.begin(BLUETOOTH_BAUD_RATE);
 }
 
 void loop(){
-  float wateringRate, dutyCycle;
+  float pwm, dutyCycle;
   String recievedData = readBluetoothData();
   if (recievedData != ""){
     buffer += recievedData;
     if(recievedData.indexOf(BLUETOOTH_DATA_DELIMITER) != -1){
       dutyCycle = parseDutyCycleData(buffer);
-      wateringRate = getWateringRate(dutyCycle);
-      Serial.println(wateringRate);
-      analogWrite(11, wateringRate);
+      pwm = getWateringRate(dutyCycle);
+      Serial.println(pwm);
+      digitalWrite(MOTOR_PIN1, LOW);
+      analogWrite(MOTOR_PIN2, pwm);
       clearBuffer();
     }
   }
 }
 
 float getWateringRate(float dutyCycle){
-  float wateringRate = (dutyCycle * 0.01) * MAX_MOTOR_SPEED;
-  return wateringRate;
+  float pwm = (dutyCycle / 100) * MAX_MOTOR_SPEED;
+  return pwm;
 }
 
 float parseDutyCycleData(String dutyCycleData){
-  dutyCycleData = dutyCycleData.substring(0, dutyCycleData.length() - 2);
+  dutyCycleData = dutyCycleData.substring(0, dutyCycleData.length() - 1);
   float dutyCycle = atof(&dutyCycleData[0]);
   return dutyCycle;
 }

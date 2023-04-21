@@ -43,7 +43,7 @@ float getHumidity(){
 	Wire.endTransmission();
 	delay(500);
 	Wire.requestFrom(SHT25_I2C_ADDRESS, 2);
-	if (Wire.available() == 2){ // humidity msb, humidity lsb
+	if (Wire.available() == 2){
 		data[0] = Wire.read();
 		data[1] = Wire.read();
 		float humidity = (((data[0] * 256.0 + data[1]) * 125.0) / 65536.0) - 6;
@@ -58,7 +58,7 @@ float getTemperature(){
 	Wire.endTransmission();
 	delay(500);
 	Wire.requestFrom(SHT25_I2C_ADDRESS, 2);
-	if (Wire.available() == 2){ // temp msb, temp lsb
+	if (Wire.available() == 2){
 		data[0] = Wire.read();
 		data[1] = Wire.read();
 		float cTemp = (((data[0] * 256.0 + data[1]) * 175.72) / 65536.0) - 46.85;
