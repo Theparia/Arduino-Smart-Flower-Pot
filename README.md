@@ -1,5 +1,4 @@
 # Arduino-Smart-Flower-Pot
-***
 
 The smart flower pot is an automated system that makes it easy for plant owners to maintain the ideal environment for their plants to grow. The system is made up of three Arduino boards - the sensor board, actuator board, and main board. Each board has a specific function in the system.
 
