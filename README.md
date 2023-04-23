@@ -20,3 +20,6 @@ The actuator board receives the command from the main board and controls the wat
 
 [![image](https://www.linkpicture.com/q/Screenshot-4198.png)](https://www.linkpicture.com/view.php?img=LPic644525d5583821029674507)
 
+
+Contributors: [Parnian Fazel](https://github.com/parnianf), [Ali Akhgari](https://github.com/AliAkhgari), [Mona Mojtahedi](https://github.com/Monamjh)
+
